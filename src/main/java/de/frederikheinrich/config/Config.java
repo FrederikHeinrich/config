@@ -57,18 +57,18 @@ public class Config {
         this.object = object;
         this.path = path;
         if (!Files.exists(path)) {
-            System.out.println("Config file does not exist: " + path.toAbsolutePath());
+            log.debug("Config file does not exist: {}", path.toAbsolutePath());
             localConfig = new JsonObject();
         }
         try {
             String config = Files.readString(path, StandardCharsets.UTF_8);
             localConfig = gson.fromJson(config, JsonObject.class);
         } catch (IOException e) {
-            log.error("Failed to load config", e);
+            log.warn("Failed to load config", e);
             localConfig = new JsonObject();
         }
 
-        System.out.println("Successfully loaded config: " + localConfig);
+        log.debug("Successfully loaded config: {}", localConfig);
         scanner = new Scanner(System.in);
         Arrays.stream(getAllFields()).forEach(field -> {
             try {
@@ -93,16 +93,15 @@ public class Config {
     private void processLocalField(Object object, Field field) throws IllegalAccessException {
         Key lc = field.getAnnotation(Key.class);
         String envValue = System.getenv(lc.env());
-        System.out.println("Processing field " + field.getName() + " with value " + envValue);
-        System.out.println("LocalConfig: " + localConfig);
+        log.debug("Processing field {} with value {}", field.getName(), envValue);
         if (envValue != null && !envValue.isEmpty()) {
             setFieldValue(field, object, envValue);
             localConfig.addProperty(lc.key(), envValue);
         } else if (localConfig.has(lc.key())) {
-            System.out.println("Setting Field " + field.getName() + " with value " + localConfig.get(lc.key()));
+            log.debug("Setting Field {} with value {}", field.getName(), localConfig.get(lc.key()));
             setFieldValue(field, object, localConfig.get(lc.key()).getAsString());
         } else {
-            System.out.println("Field " + field.getName() + " not found");
+            log.debug("Field {} not found", field.getName());
             System.out.println(lc.prompt());
             Pattern pattern = Pattern.compile(lc.regex());
 
