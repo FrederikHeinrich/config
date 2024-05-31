@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+}
+
+group = 'de.frederikheinrich'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+    maven {
+        url = "https://jitpack.io"
+    }
+}
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.tinylog:tinylog-api:2.7.0'
+    testImplementation 'org.tinylog:tinylog-impl:2.7.0'
+    // https://mvnrepository.com/artifact/org.reflections/reflections
+    implementation 'org.reflections:reflections:0.10.2'
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+}
+
+test {
+    useJUnitPlatform()
+}
